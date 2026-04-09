@@ -1,3 +1,4 @@
+import re
 from htmlnode import LeafNode
 from textnode import TextType, TextNode
 
@@ -43,6 +44,65 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
                 
     return ans
 
+def extract_markdown_images(text):
+    return re.findall(r"!\[(.*?)\]\((.*?)\)", text)
 
-a = [TextNode("This is text with a `code block` word", TextType.TEXT)]      
-print(split_nodes_delimiter(a, "`", TextType.CODE))
+def extract_markdown_links(text):
+    return re.findall(r"(?<!!)\[(.*?)\]\((.*?)\)", text)
+
+def split_nodes_image(old_nodes):
+    ans = []
+
+    change_was_made = False
+    for n in old_nodes:
+        if n.type is not TextType.TEXT:
+            ans.append(n)
+            continue
+
+        matches = extract_markdown_images(n.text)
+        if len(matches) == 0:
+            ans.append(n)
+            continue
+
+        change_was_made = True
+        match = matches[0]
+        hand = n.text.split(f"![{match[0]}]({match[1]})", 1)
+
+        if hand[0] != "":
+            ans.append(TextNode(hand[0], TextType.TEXT))
+
+        ans.append(TextNode(match[0], TextType.IMAGE, match[1]))
+
+        if hand[1] != "":
+            ans.append(TextNode(hand[1], TextType.TEXT))
+        
+    return ans if not change_was_made else split_nodes_image(ans)
+
+
+def split_nodes_link(old_nodes):
+    ans = []
+
+    change_was_made = False
+    for n in old_nodes:
+        if n.type is not TextType.TEXT:
+            ans.append(n)
+            continue
+
+        matches = extract_markdown_links(n.text)
+        if len(matches) == 0:
+            ans.append(n)
+            continue
+
+        change_was_made = True
+        match = matches[0]
+        hand = n.text.split(f"[{match[0]}]({match[1]})", 1)
+
+        if hand[0] != "":
+            ans.append(TextNode(hand[0], TextType.TEXT))
+
+        ans.append(TextNode(match[0], TextType.LINK, match[1]))
+
+        if hand[1] != "":
+            ans.append(TextNode(hand[1], TextType.TEXT))
+        
+    return ans if not change_was_made else split_nodes_link(ans)
