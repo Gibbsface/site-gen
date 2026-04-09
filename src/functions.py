@@ -28,7 +28,6 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             continue
 
         tokens = n.text.split(delimiter)
-        print(tokens)
 
         if len(tokens) % 2 == 0:
             raise Exception("Error: unmatched delimiter")
@@ -106,3 +105,16 @@ def split_nodes_link(old_nodes):
             ans.append(TextNode(hand[1], TextType.TEXT))
         
     return ans if not change_was_made else split_nodes_link(ans)
+
+
+def text_to_textnodes(text):
+    ans = [TextNode(text, TextType.TEXT)]
+    ans = split_nodes_image(ans)
+    ans = split_nodes_link(ans)
+    ans = split_nodes_delimiter(ans, "**", TextType.BOLD)
+    ans = split_nodes_delimiter(ans, "_", TextType.ITALIC)
+    ans = split_nodes_delimiter(ans, "`", TextType.CODE)
+    return ans
+
+
+
