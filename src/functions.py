@@ -1,6 +1,76 @@
 import re
-from htmlnode import LeafNode
-from textnode import TextType, TextNode
+
+from classes import *
+
+###########################
+
+def markdown_to_blocks(md):
+    # check if empty
+    if md == "":
+        raise Exception("Invalid md: md cannot be an empty string")
+    
+    # code blocks need to be detected first so that we don't parse them into smaller blocks
+    ans = separate_code_blocks_from_md(md)
+
+    #TODO right now, ans is a list of alternating code-block-strings and paragraph-strings.
+    # the paragraph strings need to be exploded into lists of blocks
+    # this function should eventually return ans when it is a list of Blocks()
+    
+    # # split into a list of block-strings
+    # try:
+    #     ans = md.split("\n\n")
+    #     ans = list(map(lambda x: x.strip(), ans))
+    #     ans = list(filter(lambda x: x != "", ans))
+    # except:
+    #     raise Exception("Invalid md: could not split into a list of block-strings")
+    
+    # # map list-of-strings to list-of-Blocks, calling constructor on each Block
+    # ans = list(map(lambda x: Block(x), ans))
+    
+    # return ans
+
+            
+def separate_code_blocks_from_md(md):
+    code_str = ""
+    ans = []
+    in_code_block = False
+    for line in md.split("\n"):
+        if not in_code_block and line == "```":
+            # entering into code block
+            code_str = "```\n"
+            in_code_block = True
+        elif in_code_block and line != "```":
+            # still in code block
+            code_str += line + "\n"
+        elif in_code_block and line == "```":
+            # exiting code block
+            ans.append(code_str + "```")
+            in_code_block = False
+        else:
+            ans.append(line)
+
+    # if you exited that loop while still in a code block, then ``` was not balanced
+    if in_code_block:
+        raise Exception("Error: invalid md. unbalanced code block")
+
+    # now collapse the other lines
+    current_str = ""
+    lines_and_code_blocks = ans.copy()
+    ans = []
+    for line in lines_and_code_blocks:
+        if len(line) >= 3 and line[0:3] == "```":
+            #code block detected
+            ans.append(current_str)
+            ans.append(line)
+            current_str = ""
+        else:
+            current_str += line + "\n"
+    ans.append(current_str + "\n")
+            
+    return ans
+
+
+############################
 
 def text_node_to_html_node(text_node):
     match text_node.type:
@@ -117,8 +187,25 @@ def text_to_textnodes(text):
     return ans
 
 
-def markdown_to_blocks(markdown):
-    ans = markdown.split("\n\n")
-    ans = list(map(lambda x: x.strip(), ans))
-    ans = list(filter(lambda x: x != "", ans))
-    return ans
+
+
+def markdown_to_html_node(markdown):
+    blocks = markdown_to_blocks(markdown)
+    ans = []
+    for b in blocks:
+        block_type = block_to_block_type(b)
+
+def block_to_text_node(block):
+    match block_to_block_type(block):
+        case BlockType.PARAGRAPH:
+            return TextNode(block, TextType.TEXT)
+        case BlockType.HEADING:
+            pass
+        case BlockType.CODE:
+            pass
+        case BlockType.QUOTE:
+            pass
+        case BlockType.UNORDERED:
+            pass
+        case BlockType.ORDERED:
+            pass
