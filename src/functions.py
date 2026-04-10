@@ -117,4 +117,8 @@ def text_to_textnodes(text):
     return ans
 
 
-
+def markdown_to_blocks(markdown):
+    ans = markdown.split("\n\n")
+    ans = list(map(lambda x: x.strip(), ans))
+    ans = list(filter(lambda x: x != "", ans))
+    return ans
