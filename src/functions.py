@@ -9,25 +9,30 @@ def markdown_to_blocks(md):
     if md == "":
         raise Exception("Invalid md: md cannot be an empty string")
     
-    # code blocks need to be detected first so that we don't parse them into smaller blocks
-    ans = separate_code_blocks_from_md(md)
+    ans = []
 
-    #TODO right now, ans is a list of alternating code-block-strings and paragraph-strings.
-    # the paragraph strings need to be exploded into lists of blocks
-    # this function should eventually return ans when it is a list of Blocks()
-    
-    # # split into a list of block-strings
-    # try:
-    #     ans = md.split("\n\n")
-    #     ans = list(map(lambda x: x.strip(), ans))
-    #     ans = list(filter(lambda x: x != "", ans))
-    # except:
-    #     raise Exception("Invalid md: could not split into a list of block-strings")
-    
-    # # map list-of-strings to list-of-Blocks, calling constructor on each Block
-    # ans = list(map(lambda x: Block(x), ans))
-    
-    # return ans
+    # first, loop through and detect all multi-line blocks
+    curr_str = ""
+    in_multiline_block = False
+    for line in md.split("\n"):
+        if not in_multiline_block and line == "```":
+            # entering into code block
+            curr_str = line + "\n"
+            in_multiline_block = True
+        elif in_multiline_block and line != "```":
+            # continuing code block
+            curr_str += line + "\n"
+        elif in_multiline_block and line == "```":
+            # exiting code block
+            ans.append(Block(curr_str + line))
+            curr_str = ""
+            in_multiline_block = False
+        elif line != "":
+            # non-empty single-line block
+            ans.append(Block(line))
+    return ans
+
+
 
             
 def separate_code_blocks_from_md(md):
