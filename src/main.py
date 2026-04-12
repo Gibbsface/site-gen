@@ -14,18 +14,14 @@ def main():
     # blocks is a list of Block objects
     blocks = markdown_to_blocks(markdown)
 
-
-    # split md into list of blocks
-    # block class has a type and content
-
-    # map list of blocks into a list of html strings
-    # iter fun will take a block obj and turn it into an htmlParent
-    # htmlParent obj will have tag, props, and innerHTML string
-
-    # map list of htmlParents into a list of html strings
+    # map blocks as list-of-Blocks into nodes as list-of-nodes
+    # nodes = list(map(lambda x: Node(x), blocks))
 
     # output html to file
 
+    # print debug lol
+    for b in blocks:
+        print(b)
 
     return 0
 

@@ -4,213 +4,110 @@ from classes import *
 
 ###########################
 
+#DONE
 def markdown_to_blocks(md):
     # check if empty
     if md == "":
         raise Exception("Invalid md: md cannot be an empty string")
     
-    ans = []
+    # scan md and extract code blocks first, that way we do not parse them
+    ans = extract_code_blocks(md)
+    # ans is now a hybrid list of strings and Block(code)
 
-    # first, loop through and detect all multi-line blocks
-    curr_str = ""
-    in_multiline_block = False
-    for line in md.split("\n"):
-        if not in_multiline_block and line == "```":
-            # entering into code block
-            curr_str = line + "\n"
-            in_multiline_block = True
-        elif in_multiline_block and line != "```":
-            # continuing code block
-            curr_str += line + "\n"
-        elif in_multiline_block and line == "```":
-            # exiting code block
-            ans.append(Block(curr_str + line))
-            curr_str = ""
-            in_multiline_block = False
-        elif line != "":
-            # non-empty single-line block
-            ans.append(Block(line))
+    # now we scan the strings and split out any images into their own blocks.
+    ans = split_image_blocks(ans)
+
+    # now we handle heading blocks
+    ans = recognize_heading_blocks(ans)
+
+    # everything else is going to be treated as a paragraph
+    ans = list(map(lambda x: x if isinstance(x, Block) else Block(x, BlockType.PARAGRAPH), ans))
+
     return ans
-
-
-
-            
-def separate_code_blocks_from_md(md):
-    code_str = ""
+    
+#DONE
+def extract_code_blocks(md):
     ans = []
+    curr_str = ""
     in_code_block = False
     for line in md.split("\n"):
         if not in_code_block and line == "```":
             # entering into code block
-            code_str = "```\n"
+            curr_str = line + "\n"
             in_code_block = True
         elif in_code_block and line != "```":
-            # still in code block
-            code_str += line + "\n"
+            # continuing code block
+            curr_str += line + "\n"
         elif in_code_block and line == "```":
             # exiting code block
-            ans.append(code_str + "```")
+            ans.append(Block(curr_str + line, BlockType.CODE))
+            curr_str = ""
             in_code_block = False
-        else:
+        elif line != "":
+            # non-empty single-line block
             ans.append(line)
-
-    # if you exited that loop while still in a code block, then ``` was not balanced
-    if in_code_block:
-        raise Exception("Error: invalid md. unbalanced code block")
-
-    # now collapse the other lines
-    current_str = ""
-    lines_and_code_blocks = ans.copy()
-    ans = []
-    for line in lines_and_code_blocks:
-        if len(line) >= 3 and line[0:3] == "```":
-            #code block detected
-            ans.append(current_str)
-            ans.append(line)
-            current_str = ""
-        else:
-            current_str += line + "\n"
-    ans.append(current_str + "\n")
-            
     return ans
 
-
-############################
-
-def text_node_to_html_node(text_node):
-    match text_node.type:
-        case TextType.TEXT:
-            return LeafNode(None, text_node.text, None)
-        case TextType.BOLD:
-            return LeafNode("b", text_node.text, None)
-        case TextType.ITALIC:
-            return LeafNode("i", text_node.text, None)
-        case TextType.CODE:
-            return LeafNode("code", text_node.text, None)
-        case TextType.LINK:
-            return LeafNode("a", text_node.text, {"href": text_node.url})
-        case TextType.IMAGE:
-            return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
-        case _:
-            raise Exception("invalid type")
-
-def split_nodes_delimiter(old_nodes, delimiter, text_type):
-    ans = []
-
-    for n in old_nodes:
-        if n.type is not TextType.TEXT:
-            ans.append(n)
-            continue
-
-        tokens = n.text.split(delimiter)
-
-        if len(tokens) % 2 == 0:
-            raise Exception("Error: unmatched delimiter")
-        
-        in_text = True
-        for t in tokens:
-            if in_text:
-                ans.append(TextNode(t, TextType.TEXT))
-                in_text = False
-            else:
-                ans.append(TextNode(t, text_type))
-                in_text = True
-                
-    return ans
-
-def extract_markdown_images(text):
-    return re.findall(r"!\[(.*?)\]\((.*?)\)", text)
-
-def extract_markdown_links(text):
-    return re.findall(r"(?<!!)\[(.*?)\]\((.*?)\)", text)
-
-def split_nodes_image(old_nodes):
-    ans = []
-
-    change_was_made = False
-    for n in old_nodes:
-        if n.type is not TextType.TEXT:
-            ans.append(n)
-            continue
-
-        matches = extract_markdown_images(n.text)
-        if len(matches) == 0:
-            ans.append(n)
-            continue
-
-        change_was_made = True
-        match = matches[0]
-        hand = n.text.split(f"![{match[0]}]({match[1]})", 1)
-
-        if hand[0] != "":
-            ans.append(TextNode(hand[0], TextType.TEXT))
-
-        ans.append(TextNode(match[0], TextType.IMAGE, match[1]))
-
-        if hand[1] != "":
-            ans.append(TextNode(hand[1], TextType.TEXT))
-        
-    return ans if not change_was_made else split_nodes_image(ans)
-
-
-def split_nodes_link(old_nodes):
-    ans = []
-
-    change_was_made = False
-    for n in old_nodes:
-        if n.type is not TextType.TEXT:
-            ans.append(n)
-            continue
-
-        matches = extract_markdown_links(n.text)
-        if len(matches) == 0:
-            ans.append(n)
-            continue
-
-        change_was_made = True
-        match = matches[0]
-        hand = n.text.split(f"[{match[0]}]({match[1]})", 1)
-
-        if hand[0] != "":
-            ans.append(TextNode(hand[0], TextType.TEXT))
-
-        ans.append(TextNode(match[0], TextType.LINK, match[1]))
-
-        if hand[1] != "":
-            ans.append(TextNode(hand[1], TextType.TEXT))
-        
-    return ans if not change_was_made else split_nodes_link(ans)
-
-
-def text_to_textnodes(text):
-    ans = [TextNode(text, TextType.TEXT)]
-    ans = split_nodes_image(ans)
-    ans = split_nodes_link(ans)
-    ans = split_nodes_delimiter(ans, "**", TextType.BOLD)
-    ans = split_nodes_delimiter(ans, "_", TextType.ITALIC)
-    ans = split_nodes_delimiter(ans, "`", TextType.CODE)
-    return ans
-
-
-
-
-def markdown_to_html_node(markdown):
-    blocks = markdown_to_blocks(markdown)
+#DONE
+def split_image_blocks(blocks):
     ans = []
     for b in blocks:
-        block_type = block_to_block_type(b)
+        if isinstance(b, Block):
+            # already a block, don't parse this
+            ans.append(b)
+            continue
 
-def block_to_text_node(block):
-    match block_to_block_type(block):
-        case BlockType.PARAGRAPH:
-            return TextNode(block, TextType.TEXT)
-        case BlockType.HEADING:
-            pass
-        case BlockType.CODE:
-            pass
-        case BlockType.QUOTE:
-            pass
-        case BlockType.UNORDERED:
-            pass
-        case BlockType.ORDERED:
-            pass
+        # parse the string for image substrings
+        matches = re.findall(r"!\[(.*?)\]\((.*?)\)", b)
+        
+        # if no img substrings are found, just append this as a string and move on
+        if not matches:
+            ans.append(b)
+            continue
+
+        # otherwise, matches is nonempty. We must scan through each match and perform a split
+        string_to_split = b
+        while len(matches) > 0:
+            m = matches.pop(0)
+            m = f"![{m[0]}]({m[1]})"
+            # m is the image substr
+
+            # append the nonempty string up until image
+            string_until_m = string_to_split.split(m, 1)[0]
+            string_to_split = string_to_split.split(m, 1)[1]
+
+            if string_until_m != "":
+                ans.append(string_until_m)
+            
+            # append the image block
+            ans.append(Block(m, BlockType.IMAGE))
+
+        # append any remaining string after the last image
+        if string_to_split != "":
+            ans.append(string_to_split)
+        
+        # after this loop, the entire string should be split into image blocks or substrings
+    return ans
+
+#DONE        
+def recognize_heading_blocks(blocks):
+    ans = []
+
+    for b in blocks:
+        #if b is a block just append and continue
+        if isinstance(b, Block):
+            ans.append(b)
+            continue
+
+        #otherwise it's a string. Detect if its a heading block
+        is_heading = bool(re.match(r"#{1,6} ", b))
+        if is_heading:
+            ans.append(Block(b, BlockType.HEADING))
+            continue
+
+        # if its not a heading, just append the string
+        ans.append(b)
+
+
+    return ans
+

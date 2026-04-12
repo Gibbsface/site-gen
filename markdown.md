@@ -6,9 +6,11 @@ This is a paragraph of text. It has some **bold** and _italic_ words inside of i
 - This is a list item
 - This is another list item
 
-## second
+## second **thing** 
 
 ### third
+
+ajfasdf asdf asdf asdf asdf  ![TEst](www.dts.edu) asf asdf af asdf as ![TEst](www.dts.edu) asdf  asdf ![TEst](www.dts.edu) asdf asdf asdf as ![TEst](www.dts.edu)
 
 askdfjakjsdf **asdf** asdf _italic_ asdf 
 
