@@ -17,6 +17,7 @@ class BlockType(Enum):
     PARAGRAPH = auto()
     IMAGE = auto()
     QUOTE = auto()
+    UNORDERED = auto()
 
 
 class Block:
@@ -44,6 +45,20 @@ class Node:
                 self.html = self.image_to_html(block.content)
             case BlockType.QUOTE:
                 self.html = self.quote_to_html(block.content)
+            case BlockType.UNORDERED:
+                self.html = self.unordered_to_html(block.content)
+
+    #TODO
+    def unordered_to_html(self, s):
+        ans = ""
+        for line in s.split("\n"):
+            if len(line) < 3:
+                continue
+            line = decorated_text_to_html(line[2:])
+            line = f"<li>{line}</li>\n"
+            ans += line
+        ans = f"<ul>\n{ans}</ul>\n"
+        return ans
 
     #DONE 
     def quote_to_html(self, s):
