@@ -36,7 +36,7 @@ class Node:
             case BlockType.HEADING:
                 self.html = self.header_to_html(block.content)
             case BlockType.CODE:
-                self.html = f"<code>{block.content}</code>"
+                self.html = self.code_to_html(block.content)
             case BlockType.PARAGRAPH:
                 self.html = self.paragraph_to_html(block.content)
             case BlockType.IMAGE:

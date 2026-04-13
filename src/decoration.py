@@ -32,7 +32,7 @@ decorator_to_html = {
     
 #TODO HANDLE LINKS
 def convert_links(text):
-    pass
+    return text
 
 def decorated_text_to_html(md):
     ans = convert_delimeters(md)
