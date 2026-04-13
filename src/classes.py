@@ -44,7 +44,7 @@ class Node:
 
     def image_to_html(self, s):
         alt = re.findall(r"\[(.+)\]", s)[0]
-        src = re.findall(r"\(.+\)", s)[0]
+        src = re.findall(r"\((.+)\)", s)[0]
         return f"<img src=\"{src}\" alt=\"{alt}\">"
 
     #DONE

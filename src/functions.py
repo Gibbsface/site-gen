@@ -1,5 +1,37 @@
 import re, warnings, os, shutil
+from functools import reduce
 from classes import *
+
+#DONE
+def generate_page(from_path, template_path, dest_path):
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+
+    md = open(from_path).read()
+    template = open(template_path).read()
+
+    # blocks is a list of Block objects
+    blocks = markdown_to_blocks(md)
+    title = extract_title(md)
+
+    # map blocks as list-of-Blocks into nodes as list-of-nodes
+    nodes = list(map(lambda x: Node(x), blocks))
+    content = list(map(lambda n: n.get_HTML(), nodes))
+    content = "\n".join(content)
+
+    template = template.replace("{{ Content }}", content)
+    template = template.replace("{{ Title }}", title)
+
+    if os.path.exists(dest_path):
+        os.remove(dest_path)
+    f = open(dest_path, "w")
+    f.write(template)
+
+#DONE
+def extract_title(md):
+    match = re.findall(r"^# (.+)", md)
+    if not match:
+        raise Exception("Error: title not found")
+    return match[0]
 
 #DONE
 def cp_to_public(top_dir, relative_path=""):
@@ -13,7 +45,7 @@ def cp_to_public(top_dir, relative_path=""):
     for item in curr_dir_list:
         item_path =  os.path.join(curr_dir_path, item)
         if os.path.isfile(item_path):
-            print(f"found file: {item_path}\ncp to {curr_target_dir}")
+            # print(f"found file: {item_path}\ncp to {curr_target_dir}")
             shutil.copy(item_path, curr_target_dir)
         else:
             os.mkdir(os.path.join(curr_target_dir, item))
