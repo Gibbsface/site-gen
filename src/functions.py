@@ -1,13 +1,22 @@
-import re, warnings, os
+import re, warnings, os, shutil
 from classes import *
 
 #TODO
-def cp_to_public(path_to_dir):
-    curr_dir_list = os.listdir(path_to_dir)
+def cp_to_public(top_dir, relative_path=""):
+    # this function lists the current directory
+    # then copies all non-directories
+    # then recursively calls itself on all sub-directories
+    curr_dir_path = os.path.join(top_dir, relative_path)
+    curr_dir_list = os.listdir(curr_dir_path)
+    curr_target_dir = os.path.join("./public", relative_path)
+    # print(f"{curr_dir_list}\n{curr_target_dir}")
     for item in curr_dir_list:
-        item_path = path_to_dir + "/" + item
+        item_path =  os.path.join(curr_dir_path, item)
         if os.path.isfile(item_path):
-            
+            # print(f"found file: {item_path}\ncp to {curr_target_dir}")
+            shutil.copy(item_path, curr_target_dir)
+        else:
+            cp_to_public(top_dir, item)
 
 #DONE
 def markdown_to_blocks(md):

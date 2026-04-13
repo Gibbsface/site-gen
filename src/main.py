@@ -31,7 +31,8 @@ def main():
 def main():
 
     # delete all in public
-    shutil.rmtree("./public")
+    if os.path.exists("./public"):
+        shutil.rmtree("./public")
     os.mkdir("./public")
 
     # copy all from static to public
