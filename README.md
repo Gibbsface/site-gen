@@ -1,10 +1,8 @@
-TODO
-- [x] in classes, Finish Node() initializer helper functions
+## TODO
 - [ ] in decoration, the function needs to handle link decoration
-- [x] in classes, Finish Node.to_HTML()
-- [x] in main, map Blocks to Nodes
-- [x] in main, map Nodes to html strings
-- [x] in main, output to html file
+- [ ] need to handle block quotes
+- [ ] need to handle unordered lists
+- [ ] need to handle ordered lists
 
 
 # Under the Hood
