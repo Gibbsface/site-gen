@@ -67,6 +67,9 @@ def markdown_to_blocks(md):
     # extract unordered lists
     ans = extract_unordered_blocks(ans)
 
+    # extract ordered lists
+    ans = extract_ordered_blocks(ans)
+
     # now we scan the strings and split out any images into their own blocks.
     ans = split_image_blocks(ans)
 
@@ -78,7 +81,33 @@ def markdown_to_blocks(md):
 
     return ans    
 
-#TODO
+def extract_ordered_blocks(blocks):
+    ans = []
+    in_ordered_block = False
+    curr_str = ""
+    for b in blocks:
+        if isinstance(b, Block):
+            ans.append(b)
+            continue
+        m = re.match(r"\d+\. ", b)
+        if not in_ordered_block and not m:
+            ans.append(b)
+        elif not in_ordered_block and m:
+            # entering block
+            curr_str += b + "\n"
+            in_ordered_block = True
+        elif in_ordered_block and not m:
+            # exiting block
+            ans.append(Block(curr_str, BlockType.ORDERED))
+            ans.append(b)
+            curr_str = ""
+            in_ordered_block = False
+        elif in_ordered_block and m:
+            curr_str += b + "\n"
+    return ans
+
+
+#DONE
 def extract_unordered_blocks(blocks):
     ans = []
     in_unordered_block = False

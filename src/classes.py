@@ -18,6 +18,7 @@ class BlockType(Enum):
     IMAGE = auto()
     QUOTE = auto()
     UNORDERED = auto()
+    ORDERED = auto()
 
 
 class Block:
@@ -47,8 +48,23 @@ class Node:
                 self.html = self.quote_to_html(block.content)
             case BlockType.UNORDERED:
                 self.html = self.unordered_to_html(block.content)
+            case BlockType.ORDERED:
+                self.html = self.ordered_to_html(block.content)
 
-    #TODO
+    #DONE
+    def ordered_to_html(self, s):
+        ans = ""
+        for line in s.split("\n"):
+            if line.strip == "" or len(line) < 3:
+                continue
+            line = decorated_text_to_html(line)
+            line = re.findall(r"^\d+\. (.+)", line)[0]
+            line = f"<li>{line}</li>\n"
+            ans += line
+        ans = f"<ol>\n{ans}</ol>\n"
+        return ans
+
+    #DONE
     def unordered_to_html(self, s):
         ans = ""
         for line in s.split("\n"):

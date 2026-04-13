@@ -1,8 +1,5 @@
 ## TODO
-- [x] in decoration, the function needs to handle link decoration
-- [x] need to handle block quotes
-- [x] need to handle unordered lists
-- [ ] need to handle ordered lists
+- continue boots
 
 
 # Under the Hood
