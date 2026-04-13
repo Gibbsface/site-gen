@@ -16,6 +16,7 @@ class BlockType(Enum):
     CODE = auto()
     PARAGRAPH = auto()
     IMAGE = auto()
+    QUOTE = auto()
 
 
 class Block:
@@ -41,7 +42,26 @@ class Node:
                 self.html = self.paragraph_to_html(block.content)
             case BlockType.IMAGE:
                 self.html = self.image_to_html(block.content)
+            case BlockType.QUOTE:
+                self.html = self.quote_to_html(block.content)
 
+    #DONE 
+    def quote_to_html(self, s):
+        ans = ""
+        lines_list = s.split("\n")
+
+        for line in lines_list:
+            if line == "":
+                continue
+            line = line.replace(">", "", 1)
+            line = line.lstrip()
+            line += "<br>\n"
+            ans += line
+        ans = ans[:-5]
+        ans = "<blockquote>" + ans + "</blockquote>"
+        return ans
+
+    #DONE
     def image_to_html(self, s):
         alt = re.findall(r"\[(.+)\]", s)[0]
         src = re.findall(r"\((.+)\)", s)[0]

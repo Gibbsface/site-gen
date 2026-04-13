@@ -1,6 +1,6 @@
 ## TODO
-- [ ] in decoration, the function needs to handle link decoration
-- [ ] need to handle block quotes
+- [x] in decoration, the function needs to handle link decoration
+- [x] need to handle block quotes
 - [ ] need to handle unordered lists
 - [ ] need to handle ordered lists
 

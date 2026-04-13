@@ -61,6 +61,8 @@ def markdown_to_blocks(md):
     ans = extract_code_blocks(md)
     # ans is now a hybrid list of strings and Block(code)
 
+    ans = extract_quote_blocks(ans)
+
     # now we scan the strings and split out any images into their own blocks.
     ans = split_image_blocks(ans)
 
@@ -72,6 +74,33 @@ def markdown_to_blocks(md):
 
     return ans
     
+
+#TODO
+def extract_quote_blocks(blocks):
+    ans = []
+    in_quote_block = False
+    curr_str = ""
+    for b in blocks:
+        if isinstance(b, Block):
+            ans.append(b)
+            continue
+        if len(b) > 0 and b[0] == ">" and not in_quote_block:
+            # entering quote block
+            in_quote_block = True
+            curr_str += b + "\n"
+        elif len(b) > 0 and b[0] == ">" and in_quote_block:
+            # continuing quote block
+            curr_str += b + "\n"
+        elif len(b) > 0 and b[0] != ">" and in_quote_block:
+            # exiting quote block
+            in_quote_block = False
+            ans.append(Block(curr_str, BlockType.QUOTE))
+            curr_str = ""
+            ans.append(b)
+        else:
+            ans.append(b)
+    return ans
+
 #DONE
 def extract_code_blocks(md):
     ans = []

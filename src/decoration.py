@@ -1,3 +1,4 @@
+import re
 
 decorators = [
     "`",
@@ -29,15 +30,21 @@ decorator_to_html = {
         "~~": "</s>",        
     },
 }
-    
-#TODO HANDLE LINKS
-def convert_links(text):
-    return text
 
 def decorated_text_to_html(md):
     ans = convert_delimeters(md)
     ans = convert_links(ans)
     return ans
+
+#DONE HANDLE LINKS
+def convert_links(text):
+    m = re.findall(r"\[(.+?)\]\((.+?)\)", text)
+    if len(m) == 0:
+        return text
+    inner = m[0][0]
+    href = m[0][1]
+    text = text.replace(f"[{inner}]({href})", f"<a href=\"{href}\">{inner}</a>")
+    return convert_links(text)
 
 def convert_delimeters(md):
     # this is a doozy
@@ -51,7 +58,6 @@ def convert_delimeters(md):
         if c not in decorators:
             ans += c
             continue
-
 
         # at this point, we know c is a decorator. We need to peek ahead and see if its 1 or 2
         try:
