@@ -1,6 +1,6 @@
 from functions import *
 from classes import Node
-
+import os, shutil
 
 def main():
     
@@ -27,5 +27,15 @@ def main():
         raise Exception("Error: could not write to index.html")
 
     return 0
+
+def main():
+
+    # delete all in public
+    shutil.rmtree("./public")
+    os.mkdir("./public")
+
+    # copy all from static to public
+    cp_to_public("./static")
+
 
 main()

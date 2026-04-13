@@ -1,5 +1,13 @@
-import re, warnings
+import re, warnings, os
 from classes import *
+
+#TODO
+def cp_to_public(path_to_dir):
+    curr_dir_list = os.listdir(path_to_dir)
+    for item in curr_dir_list:
+        item_path = path_to_dir + "/" + item
+        if os.path.isfile(item_path):
+            
 
 #DONE
 def markdown_to_blocks(md):
