@@ -1,4 +1,5 @@
 from enum import Enum, auto
+from decoration import decorated_text_to_html
 import re
 
 # these are all in-line node types
@@ -16,14 +17,14 @@ class BlockType(Enum):
     PARAGRAPH = auto()
     IMAGE = auto()
 
+
 class Block:
     def __init__(self, content, type=BlockType.PARAGRAPH):
         self.content = content
         self.type = type
 
     def __repr__(self):
-        return f"Block(type={self.type}, content=\"{self.content[0 : min(10, len(self.content))]}...\")"
-        
+        return f"Block(type={self.type}, content=\"{self.content[0 : min(10, len(self.content))]}...\")"    
 
 class Node:
     def __init__(self, block):
@@ -33,22 +34,52 @@ class Node:
         
         match block.type:
             case BlockType.HEADING:
-                self.tag = get_heading_tag(block.content)
-                self.props = None
-                self.innerHTML = convert_decorations_to_html(block.content)
+                self.html = self.header_to_html(block.content)
             case BlockType.CODE:
-                self.tag = "code"
-                self.props = None
-                self.innerHTML = block.content
+                self.html = f"<code>{block.content}</code>"
             case BlockType.PARAGRAPH:
-                self.tag = "p"
-                self.props = None
-                self.innerHTML = convert_decorations_to_html(block.content)
+                self.html = self.paragraph_to_html(block.content)
             case BlockType.IMAGE:
-                self.tag = "img"
-                self.props = get_img_props(block.content)
-                self.innerHTML = None
+                self.html = self.image_to_html(block.content)
 
-    def to_HTML(self):
-        # this will output valid HTML of this node and all of its "children"
-        pass
+    def image_to_html(self, s):
+        alt = re.findall(r"\[(.+)\]", s)[0]
+        src = re.findall(r"\(.+\)", s)[0]
+        return f"<img src=\"{src}\" alt=\"{alt}\">"
+
+    #DONE
+    def code_to_html(self, s):
+        return f"<code>{s}</code>"
+
+    #DONE
+    def paragraph_to_html(self, s):
+        try:
+            return f"<p>{decorated_text_to_html(s)}</p>"
+        except:
+            raise Exception(f"Error: trying to parse paragraph: {s}")
+
+    #DONE
+    def header_to_html(self, s):
+        try:
+            ans = re.findall(r"^(#+) (.+)", s)
+            h_size = len(ans[0][0])
+            text = ans[0][1]
+            
+            innerHTML = decorated_text_to_html(text)
+
+            return f"<h{h_size}>{innerHTML}</h{h_size}>"
+        except ValueError as e:
+            raise e
+        except:
+            raise Exception(f"Error: trying to parse this as a header \"{s}\"")
+
+    #DONE
+    def __repr__(self):
+        if len(self.html) < 20:
+            return f"Node({self.html})"
+        else:
+            return f"Node({self.html[0:8]}...{self.html[-8:]})"
+        
+    #DONE
+    def get_HTML(self):
+        return self.html

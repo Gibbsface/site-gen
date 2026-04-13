@@ -10,9 +10,15 @@ This is a paragraph of text. It has some **bold** and _italic_ words inside of i
 
 ### third
 
-ajfasdf asdf asdf asdf asdf  ![TEst](www.dts.edu) asf asdf af asdf as ![TEst](www.dts.edu) asdf  asdf ![TEst](www.dts.edu) asdf asdf asdf as ![TEst](www.dts.edu)
+###### six
 
-askdfjakjsdf **asdf** asdf _italic_ asdf 
+####### asdfasdf
+
+ajfasdf asdf asdf asdf asdf   asf asdf af asdf as [TEst](www.dts.edu) asdf  asdf TEst](www.dts.edu) asdf asdf asdf as TEst](www.dts.edu)
+
+![TEst](www.dts.edu)
+
+askdfjakjsdf **asdf** asdf _italic_ asdf __asdf asdf _asdf_ asdf__
 
 1. one
 2. sadf
@@ -60,7 +66,7 @@ as **asldifjasd** asdfjkn [][] asdofoij ![test](asdfausdfh)
 _asdf_
 ```
 
-and more [i am a link](www.dts.edu) **asdfjasdf** asnd **_asdf_ ![TEst](www.dts.edu)**
+and more [i am a link](www.dts.edu) **asdfjasdf** asnd **_asdf_ [TEst](www.dts.edu)**
 sdaf
 and so on
 

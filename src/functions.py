@@ -1,8 +1,5 @@
-import re
-
+import re, warnings
 from classes import *
-
-###########################
 
 #DONE
 def markdown_to_blocks(md):
@@ -33,14 +30,14 @@ def extract_code_blocks(md):
     for line in md.split("\n"):
         if not in_code_block and line == "```":
             # entering into code block
-            curr_str = line + "\n"
+            # curr_str = line + "\n" # we don't actually want to store this delimiter
             in_code_block = True
         elif in_code_block and line != "```":
             # continuing code block
             curr_str += line + "\n"
         elif in_code_block and line == "```":
             # exiting code block
-            ans.append(Block(curr_str + line, BlockType.CODE))
+            ans.append(Block(curr_str, BlockType.CODE))
             curr_str = ""
             in_code_block = False
         elif line != "":
@@ -77,6 +74,7 @@ def split_image_blocks(blocks):
             string_to_split = string_to_split.split(m, 1)[1]
 
             if string_until_m != "":
+                warnings.warn(f"Warning: I do not allow images in paragraphs. \npara=\n{b}")
                 ans.append(string_until_m)
             
             # append the image block

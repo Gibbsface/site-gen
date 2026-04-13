@@ -1,5 +1,5 @@
 from functions import *
-from classes import *
+from classes import Node
 
 
 def main():
@@ -15,13 +15,16 @@ def main():
     blocks = markdown_to_blocks(markdown)
 
     # map blocks as list-of-Blocks into nodes as list-of-nodes
-    # nodes = list(map(lambda x: Node(x), blocks))
+    nodes = list(map(lambda x: Node(x), blocks))
 
     # output html to file
-
-    # print debug lol
-    for b in blocks:
-        print(b)
+    try:
+        path_to_index = "./public/index.html"
+        f = open(path_to_index, "w")
+        for n in nodes:
+            f.write(n.get_HTML() + "\n")
+    except:
+        raise Exception("Error: could not write to index.html")
 
     return 0
 

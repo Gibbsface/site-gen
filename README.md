@@ -1,3 +1,11 @@
+TODO
+- [ ] in classes, Finish Node() initializer helper functions
+- [ ] in decoration, the function needs to handle link decoration
+- [x] in classes, Finish Node.to_HTML()
+- [ ] in main, map Blocks to Nodes
+- [ ] in main, map Nodes to html strings
+- [ ] in main, output to html file
+
 
 # Under the Hood
 The parser will read `markdown.md` in the root of this directory. It can only handle the following block types and text decorators:
@@ -13,6 +21,7 @@ The parser will read `markdown.md` in the root of this directory. It can only ha
 - - Link
 - - Bold
 - - Italic
+- - Strikethrough
 
 # Instructions
 run with `./main.sh`
