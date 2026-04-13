@@ -1,7 +1,7 @@
 import re, warnings, os, shutil
 from classes import *
 
-#TODO
+#DONE
 def cp_to_public(top_dir, relative_path=""):
     # this function lists the current directory
     # then copies all non-directories
@@ -13,9 +13,10 @@ def cp_to_public(top_dir, relative_path=""):
     for item in curr_dir_list:
         item_path =  os.path.join(curr_dir_path, item)
         if os.path.isfile(item_path):
-            # print(f"found file: {item_path}\ncp to {curr_target_dir}")
+            print(f"found file: {item_path}\ncp to {curr_target_dir}")
             shutil.copy(item_path, curr_target_dir)
         else:
+            os.mkdir(os.path.join(curr_target_dir, item))
             cp_to_public(top_dir, item)
 
 #DONE
