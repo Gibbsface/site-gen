@@ -3,19 +3,19 @@ from functools import reduce
 from classes import *
 
 #DONE
-def rec_generate_pages(dir_path_content, template_path, dest_dir_path):
+def rec_generate_pages(dir_path_content, template_path, dest_dir_path, basepath):
     curr_dir_list = os.listdir(dir_path_content)
     for item in curr_dir_list:
         item_path = os.path.join(dir_path_content, item)
         if os.path.isdir(item_path):
             # print(f"TEST: checking dir {item_path}")
-            rec_generate_pages(item_path, template_path, os.path.join(dest_dir_path, item))
+            rec_generate_pages(item_path, template_path, os.path.join(dest_dir_path, item), basepath)
         elif os.path.isfile(item_path):
             # print(f"TEST: found file {item_path}")
             dest = os.path.join(dest_dir_path, item).replace(".md", ".html")
-            generate_page(item_path, template_path, dest)
+            generate_page(item_path, template_path, dest, basepath)
 #DONE
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 
     md = open(from_path).read()
@@ -32,6 +32,8 @@ def generate_page(from_path, template_path, dest_path):
 
     template = template.replace("{{ Content }}", content)
     template = template.replace("{{ Title }}", title)
+    template = template.replace("href=\"/", f"href=\"{basepath}")
+    template = template.replace("src=\"/", f"src=\"{basepath}")
 
     if os.path.exists(dest_path):
         os.remove(dest_path)
@@ -47,13 +49,13 @@ def extract_title(md):
     return match[0]
 
 #DONE
-def cp_to_public(top_dir, relative_path=""):
+def cp_to_public(top_dir, build_dir, relative_path=""):
     # this function lists the current directory
     # then copies all non-directories
     # then recursively calls itself on all sub-directories
     curr_dir_path = os.path.join(top_dir, relative_path)
     curr_dir_list = os.listdir(curr_dir_path)
-    curr_target_dir = os.path.join("./public", relative_path)
+    curr_target_dir = os.path.join("./" + build_dir, relative_path)
     # print(f"{curr_dir_list}\n{curr_target_dir}")
     for item in curr_dir_list:
         item_path =  os.path.join(curr_dir_path, item)
@@ -62,7 +64,7 @@ def cp_to_public(top_dir, relative_path=""):
             shutil.copy(item_path, curr_target_dir)
         else:
             os.mkdir(os.path.join(curr_target_dir, item))
-            cp_to_public(top_dir, item)
+            cp_to_public(top_dir, build_dir, item)
 
 #DONE
 def markdown_to_blocks(md):
