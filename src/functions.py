@@ -2,9 +2,8 @@ import re, warnings, os, shutil
 from functools import reduce
 from classes import *
 
-#TODO
+#DONE
 def rec_generate_pages(dir_path_content, template_path, dest_dir_path):
-
     curr_dir_list = os.listdir(dir_path_content)
     for item in curr_dir_list:
         item_path = os.path.join(dir_path_content, item)
