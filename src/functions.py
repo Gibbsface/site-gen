@@ -2,9 +2,22 @@ import re, warnings, os, shutil
 from functools import reduce
 from classes import *
 
+#TODO
+def rec_generate_pages(dir_path_content, template_path, dest_dir_path):
+
+    curr_dir_list = os.listdir(dir_path_content)
+    for item in curr_dir_list:
+        item_path = os.path.join(dir_path_content, item)
+        if os.path.isdir(item_path):
+            # print(f"TEST: checking dir {item_path}")
+            rec_generate_pages(item_path, template_path, os.path.join(dest_dir_path, item))
+        elif os.path.isfile(item_path):
+            # print(f"TEST: found file {item_path}")
+            dest = os.path.join(dest_dir_path, item).replace(".md", ".html")
+            generate_page(item_path, template_path, dest)
 #DONE
 def generate_page(from_path, template_path, dest_path):
-    # print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 
     md = open(from_path).read()
     template = open(template_path).read()
