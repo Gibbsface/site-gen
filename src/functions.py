@@ -4,7 +4,7 @@ from classes import *
 
 #DONE
 def generate_page(from_path, template_path, dest_path):
-    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+    # print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 
     md = open(from_path).read()
     template = open(template_path).read()
@@ -23,6 +23,7 @@ def generate_page(from_path, template_path, dest_path):
 
     if os.path.exists(dest_path):
         os.remove(dest_path)
+    os.makedirs(dest_path.replace("index.html", ""), exist_ok=True)
     f = open(dest_path, "w")
     f.write(template)
 
@@ -105,7 +106,6 @@ def extract_ordered_blocks(blocks):
         elif in_ordered_block and m:
             curr_str += b + "\n"
     return ans
-
 
 #DONE
 def extract_unordered_blocks(blocks):
